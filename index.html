@@ -1,0 +1,716 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>给池小晨的生日惊喜</title>
+<style>
+:root{
+  --rose:#f47ba2; --gold:#f6b93b; --cream:#fff7f3; --ink:#4a2c3a; --sub:#9a6b7d;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{width:100%;height:100%;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  background:#1b0f14; color:var(--ink); overflow:hidden;
+  padding-left:env(safe-area-inset-left); padding-right:env(safe-area-inset-right);
+  padding-top:env(safe-area-inset-top); padding-bottom:env(safe-area-inset-bottom);
+}
+/* ---------- 场景层 ---------- */
+.scene{
+  position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transform:scale(.96); transition:opacity .7s ease, transform .7s ease;
+  overflow:hidden; padding:24px 18px; z-index:1;
+}
+.scene.active{opacity:1; pointer-events:auto; transform:scale(1); z-index:10;}
+.btn{
+  min-height:48px; padding:0 34px; border:none; border-radius:999px; font-size:16px; font-weight:600;
+  background:linear-gradient(135deg,var(--rose),#f6a9c2); color:#fff; cursor:pointer; box-shadow:0 8px 24px rgba(244,123,162,.35);
+  transition:transform .15s ease, opacity .2s;
+}
+.btn:active{transform:scale(.95);}
+.btn.ghost{background:rgba(255,255,255,.12); box-shadow:none; color:#ffe9f0; border:1px solid rgba(255,255,255,.35);}
+.hint{font-size:13px; color:var(--sub); margin-top:10px; text-align:center;}
+
+/* ---------- 1 锁屏门 ---------- */
+#scene-lock{background:radial-gradient(120% 90% at 50% 10%, #3b1f2c 0%, #1b0f14 70%);}
+.lock-inner{text-align:center; width:100%; max-width:420px;}
+.lock-gift{font-size:72px; animation:floaty 3s ease-in-out infinite; display:inline-block;}
+@keyframes floaty{0%,100%{transform:translateY(0) rotate(-4deg);}50%{transform:translateY(-14px) rotate(4deg);}}
+.lock-title{color:#ffe9f0; font-size:22px; font-weight:700; margin:18px 0 6px;}
+.lock-sub{color:#d9aabb; font-size:14px; line-height:1.8; margin-bottom:26px;}
+.lock-sub b{color:var(--gold);}
+.lock-input{
+  width:min(320px,86%); height:56px; text-align:center; font-size:26px; letter-spacing:14px; font-weight:700;
+  background:rgba(255,255,255,.08); color:#fff; border:1.5px solid rgba(255,255,255,.25); border-radius:16px;
+  outline:none; caret-color:var(--gold);
+}
+.lock-input:focus{border-color:var(--gold);}
+.lock-err{color:#ff8fa3; font-size:13px; margin-top:10px; min-height:18px;}
+.lock-enter{margin-top:22px;}
+#daysAlive{color:#cfe0ff; font-size:14px; margin-top:14px; letter-spacing:.5px;}
+
+/* ---------- 2 开场 ---------- */
+#scene-hero{background:radial-gradient(120% 100% at 50% 0%, #4a2433 0%, #1b0f14 75%);}
+.hero-photo{
+  width:min(300px,72vw); aspect-ratio:3/4; border-radius:22px; overflow:hidden; position:relative;
+  box-shadow:0 24px 60px rgba(0,0,0,.45); animation:heroSpin 14s linear infinite;
+  background:linear-gradient(160deg,#f9c9d8,#f6e3c9);
+}
+.hero-photo img, .hero-photo .ph{width:100%; height:100%; object-fit:cover; display:block;}
+.hero-photo .ph{display:flex; align-items:center; justify-content:center; font-size:64px; color:#fff; text-shadow:0 4px 18px rgba(0,0,0,.2);}
+@keyframes heroSpin{
+  0%{transform:perspective(900px) rotateY(0deg) rotateZ(0deg);}
+  25%{transform:perspective(900px) rotateY(8deg) rotateZ(1.2deg);}
+  50%{transform:perspective(900px) rotateY(0deg) rotateZ(0deg);}
+  75%{transform:perspective(900px) rotateY(-8deg) rotateZ(-1.2deg);}
+  100%{transform:perspective(900px) rotateY(0deg) rotateZ(0deg);}
+}
+.hero-greet{
+  margin-top:30px; font-size:clamp(24px,7vw,34px); font-weight:800; color:#fff;
+  text-shadow:0 2px 20px rgba(0,0,0,.4); min-height:44px; white-space:pre-wrap; text-align:center; line-height:1.4;
+}
+.hero-greet .cursor{display:inline-block; width:3px; height:1em; background:var(--gold); vertical-align:-2px; animation:blink 1s step-end infinite;}
+@keyframes blink{50%{opacity:0;}}
+.hero-sub{color:#e3b8c9; font-size:14px; margin-top:10px; text-align:center;}
+.hero-start{margin-top:34px;}
+
+/* ---------- 3 相册 ---------- */
+#scene-album{background:linear-gradient(180deg,#2a1620 0%,#1b0f14 100%);}
+.album-title{color:#ffe9f0; font-size:20px; font-weight:700; margin-bottom:6px;}
+.album-sub{color:#d9aabb; font-size:13px; margin-bottom:18px;}
+.album-track{
+  display:flex; gap:14px; width:100%; max-width:560px; overflow-x:auto; -webkit-overflow-scrolling:touch;
+  scroll-snap-type:x mandatory; padding:20px 6px 26px;
+}
+.album-track::-webkit-scrollbar{display:none;}
+.album-card{
+  flex:0 0 68%; max-width:300px; scroll-snap-align:center; border-radius:18px; overflow:hidden; position:relative;
+  background:#fff; box-shadow:0 18px 40px rgba(0,0,0,.4); aspect-ratio:3/4;
+}
+.album-card:nth-child(odd){transform:rotate(-1.6deg);}
+.album-card:nth-child(even){transform:rotate(1.6deg);}
+.album-card img, .album-card .ph{width:100%; height:100%; object-fit:cover; display:block;}
+.album-card .ph{display:flex; align-items:center; justify-content:center; font-size:56px; background:linear-gradient(160deg,#f9c9d8,#f6e3c9); color:#fff;}
+.album-cap{
+  position:absolute; left:0; right:0; bottom:0; padding:26px 12px 12px;
+  background:linear-gradient(transparent, rgba(0,0,0,.72)); color:#fff; font-size:13px; line-height:1.6; text-align:center;
+}
+.album-next{margin-top:4px;}
+
+/* ---------- 4 蛋糕 ---------- */
+#scene-cake{background:radial-gradient(120% 90% at 50% 25%, #4a1f2e 0%, #16090e 80%);}
+.cake-title{color:#ffe9f0; font-size:20px; font-weight:700; margin-bottom:2px;}
+.cake-sub{color:#d9aabb; font-size:13px; margin-bottom:6px; text-align:center; line-height:1.7;}
+.cake-stage{position:relative; width:100%; max-width:430px; display:flex; justify-content:center; align-items:flex-end; min-height:300px;}
+.candles{display:flex; flex-wrap:wrap; justify-content:center; gap:10px 14px; position:absolute; top:-6px; width:100%; z-index:3;}
+.candle{position:relative; width:14px; height:56px; cursor:pointer;}
+.candle .body{position:absolute; bottom:0; left:2px; right:2px; height:44px; border-radius:4px 4px 3px 3px;
+  background:linear-gradient(180deg,#fff6e8,#ffe3bd 60%,#ffd9a8); border:1px solid #f2c892;}
+.candle .wick{position:absolute; top:0; left:50%; transform:translateX(-50%); width:2px; height:8px; background:#7a5230;}
+.candle .flame{position:absolute; top:-16px; left:50%; transform:translateX(-50%); width:14px; height:18px;
+  background:radial-gradient(circle at 50% 70%, #fff7c0 0%, #ffd36b 45%, #ff9d3d 80%, transparent 100%);
+  border-radius:50% 50% 50% 50%/62% 62% 38% 38%; animation:flicker .32s ease-in-out infinite alternate;}
+@keyframes flicker{from{transform:translateX(-50%) scale(1) rotate(-2deg);}to{transform:translateX(-50%) scale(1.14) rotate(2deg);}}
+.candle.out .flame{display:none;}
+.candle.out .smoke{position:absolute; top:-14px; left:50%; transform:translateX(-50%); font-size:11px; animation:smokeUp 1.4s ease-out forwards; opacity:0; color:#cfc3c0;}
+@keyframes smokeUp{0%{opacity:.9; transform:translateX(-50%) translateY(0) scale(1);}100%{opacity:0; transform:translateX(-50%) translateY(-34px) scale(1.5);}}
+.cake{position:relative; width:min(300px,72vw);}
+.cake-layer{width:100%; border-radius:14px; margin:0 auto; position:relative;}
+.cake-l1{height:64px; background:linear-gradient(180deg,#c98bb0,#a5678f); box-shadow:0 6px 14px rgba(0,0,0,.35); border-radius:14px;}
+.cake-l2{height:88px; width:82%; background:linear-gradient(180deg,#e6b7d3,#cf8fb8); margin:-10px auto 0; border-radius:14px;}
+.cake-icing{position:absolute; top:-9px; left:4%; right:4%; height:16px; background:#fff3ee; border-radius:999px; box-shadow:0 3px 8px rgba(0,0,0,.18);}
+.cake-deco{position:absolute; font-size:18px;}
+.cake-plate{width:118%; margin-left:-9%; height:16px; background:linear-gradient(180deg,#f7e7ef,#e7c9d8); border-radius:50%; margin-top:-8px;}
+.candle-hint{color:#d9aabb; font-size:13px; text-align:center; line-height:1.8; margin-top:14px;}
+.candle-hint b{color:var(--gold);}
+#blowBtn{display:none;}
+
+/* ---------- 5 许愿 ---------- */
+#scene-wish{background:#0a0710;}
+#starCanvas,#fxCanvas,#heartCanvas{position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:45; transition:opacity .5s;}
+#starCanvas{opacity:0;} #fxCanvas{opacity:0;}
+.wish-title{color:#e8e2ff; font-size:24px; font-weight:700; text-shadow:0 0 24px rgba(180,150,255,.6); position:relative; z-index:6;}
+.wish-sub{color:#b9aed6; font-size:14px; margin-top:10px; text-align:center; z-index:6; position:relative; line-height:1.7;}
+.wish-count{color:var(--gold); font-size:30px; font-weight:800; margin-top:18px; z-index:6; position:relative;}
+.wish-ok{margin-top:26px; z-index:6; position:relative;}
+
+/* ---------- 6 爆发 ---------- */
+#scene-burst{background:radial-gradient(120% 100% at 50% 0%, #571f38 0%, #1c0c16 80%);}
+.burst-title{color:#fff; font-size:26px; font-weight:800; text-shadow:0 0 30px rgba(255,180,90,.7); z-index:6; text-align:center; line-height:1.5;}
+.burst-sub{color:#ffd9e6; font-size:14px; margin-top:12px; z-index:6; text-align:center;}
+.burst-next{margin-top:30px; z-index:6; position:relative;}
+
+/* ---------- 7 评论墙 ---------- */
+#scene-comments{background:#160a11;}
+.comments-title{color:#ffe9f0; font-size:20px; font-weight:700; text-align:center;}
+.comments-sub{color:#d9aabb; font-size:13px; margin:6px 0 14px; text-align:center; line-height:1.7;}
+.marquee-wrap{position:relative; width:100%; max-width:620px; height:190px; overflow:hidden;}
+.mq-row{position:absolute; left:0; right:0; height:60px; display:flex; align-items:center; gap:12px; white-space:nowrap;}
+.mq-row.r1{top:8px;} .mq-row.r2{top:76px;} .mq-row.r3{top:144px;}
+.mq-pill{
+  display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.14);
+  color:#ffe9f0; font-size:13px; border-radius:999px; padding:8px 16px; will-change:transform;
+}
+.mq-pill .ava{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--rose),var(--gold));display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;flex:none;}
+.mq-pill .nm{color:#ffb6cf; margin-right:2px;}
+.mq-pill .tm{color:#9a6b7d; font-size:11px; margin-left:6px;}
+.mq-anim{animation:mqLeft linear infinite;}
+@keyframes mqLeft{from{transform:translateX(-130%);}to{transform:translateX(130vw);}}
+.comments-tools{display:flex; gap:12px; margin-top:18px; flex-wrap:wrap; justify-content:center;}
+.comments-next{margin-top:18px;}
+
+/* 弹幕雨 */
+.dm-layer{position:fixed; inset:0; pointer-events:none; z-index:46; opacity:0; transition:opacity .4s;}
+.dm-layer.on{opacity:1;}
+.dm-layer .dm{position:absolute; white-space:nowrap; color:#fff; background:rgba(0,0,0,.32); border-radius:999px; padding:5px 12px; font-size:13px; will-change:transform; animation:dmRight linear infinite;}
+@keyframes dmRight{from{transform:translateX(-110%);}to{transform:translateX(110vw);}}
+
+/* ---------- 8 情书 ---------- */
+#scene-letter{background:linear-gradient(180deg,#241018 0%,#150a10 100%);}
+.letter-card{
+  width:min(560px,92vw); max-height:68vh; overflow-y:auto; background:#fffdf8; border-radius:18px;
+  padding:28px 24px; box-shadow:0 24px 60px rgba(0,0,0,.5); position:relative;
+  font-family:"Kaiti SC","STKaiti",KaiTi,"PingFang SC",serif; color:#5c3a44; font-size:16px; line-height:2;
+}
+.letter-card h2{text-align:center; font-size:20px; color:#c2455f; margin-bottom:12px;}
+.letter-card p{margin-bottom:14px; text-indent:2em;}
+.letter-card .ending{text-indent:0; text-align:center; font-size:18px; color:#c2455f; font-weight:700; margin-top:6px;}
+.letter-card::-webkit-scrollbar{width:4px;}
+.letter-card::-webkit-scrollbar-thumb{background:#e0b7c6; border-radius:4px;}
+.letter-tools{display:flex; gap:12px; margin-top:20px; flex-wrap:wrap; justify-content:center;}
+#secretBtn{background:none;border:none;font-size:30px;cursor:pointer;padding:10px;color:#c2455f;animation:floaty 3s ease-in-out infinite;display:inline-block;}
+.heart-burst-tip{color:#d9aabb; font-size:12.5px; margin-top:12px; text-align:center; line-height:1.8;}
+
+/* toast */
+#toast{
+  position:fixed; left:50%; bottom:10%; transform:translateX(-50%) translateY(20px); z-index:50;
+  background:rgba(30,12,20,.92); color:#ffe9f0; border:1px solid rgba(255,255,255,.2); border-radius:14px;
+  padding:12px 22px; font-size:14px; line-height:1.7; text-align:center; opacity:0; pointer-events:none;
+  transition:opacity .3s, transform .3s; max-width:82vw;
+}
+#toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+#topBar{position:fixed; top:env(safe-area-inset-top); left:0; right:0; z-index:40; display:flex; justify-content:center; padding:8px;}
+#progress{width:70%; max-width:300px; height:4px; background:rgba(255,255,255,.18); border-radius:4px; overflow:hidden;}
+#progress i{display:block; height:100%; width:0%; background:linear-gradient(90deg,var(--gold),var(--rose)); border-radius:4px; transition:width .5s;}
+</style>
+</head>
+<body>
+
+<!-- 顶部分页进度 -->
+<div id="topBar"><div id="progress"><i></i></div></div>
+
+<!-- ===== 1 锁屏门 ===== -->
+<section id="scene-lock" class="scene active">
+  <div class="lock-inner">
+    <div class="lock-gift">🎁</div>
+    <div class="lock-title">有一份生日惊喜，只属于你</div>
+    <div class="lock-sub">
+      今天是 <b id="lockDate">10 月 28 日</b><br>
+      输入你的专属密码，才能打开它
+    </div>
+    <input id="lockInput" class="lock-input" type="password" inputmode="numeric" placeholder="••••" maxlength="6" autocomplete="off">
+    <div id="lockErr" class="lock-err"></div>
+    <button id="lockBtn" class="btn lock-enter">解锁惊喜</button>
+    <div id="daysAlive"></div>
+  </div>
+</section>
+
+<!-- ===== 2 开场 ===== -->
+<section id="scene-hero" class="scene">
+  <div class="hero-photo" id="heroPhoto"></div>
+  <div class="hero-greet" id="heroGreet"></div>
+  <div class="hero-sub" id="heroSub"></div>
+  <button class="btn hero-start" id="heroNext">开始我们的回忆 ➤</button>
+</section>
+
+<!-- ===== 3 相册 ===== -->
+<section id="scene-album" class="scene">
+  <div class="album-title">我们的回忆</div>
+  <div class="album-sub">← 左右滑动翻看 →</div>
+  <div class="album-track" id="albumTrack"></div>
+  <button class="btn album-next" id="albumNext">接下来，一起许愿 🎂</button>
+</section>
+
+<!-- ===== 4 蛋糕 ===== -->
+<section id="scene-cake" class="scene">
+  <div class="cake-title">许个愿吧，寿星</div>
+  <div class="cake-sub">先吹灭蜡烛 —— 你可以 <b>点一下蜡烛</b>，<br>也可以 <b id="micTap">对着手机吹气</b> 真的把它吹灭</div>
+  <div class="cake-stage">
+    <div class="candles" id="candleRow"></div>
+    <div class="cake">
+      <div class="cake-icing"></div>
+      <div class="cake-layer cake-l2"></div>
+      <div class="cake-layer cake-l1"></div>
+      <div class="cake-plate"></div>
+    </div>
+  </div>
+  <div class="candle-hint" id="candleHint">还剩 <b id="candleLeft">0</b> 支蜡烛</div>
+  <button class="btn ghost" id="blowBtn">🎤 开启「真吹」模式</button>
+</section>
+
+<!-- ===== 5 许愿 ===== -->
+<section id="scene-wish" class="scene">
+  <div class="wish-title">闭上眼睛，许个愿吧 ✨</div>
+  <div class="wish-sub">我会在 7 秒后，把星光和祝福一起送给你</div>
+  <div class="wish-count" id="wishCount">7</div>
+  <button class="btn wish-ok" id="wishOk">我许好了 💫</button>
+</section>
+
+<!-- ===== 6 爆发 ===== -->
+<section id="scene-burst" class="scene">
+  <div class="burst-title" id="burstTitle"></div>
+  <div class="burst-sub">你的心愿，值得全世界的烟花</div>
+  <button class="btn burst-next" id="burstNext">还有惊喜在等你 🎊</button>
+</section>
+
+<!-- ===== 7 评论墙 ===== -->
+<section id="scene-comments" class="scene">
+  <div class="comments-title">来自大家的祝福</div>
+  <div class="comments-sub">每个人都在等你今天，要开心哦 💗</div>
+  <div class="marquee-wrap" id="marqueeWrap"></div>
+  <div class="comments-tools">
+    <button class="btn ghost" id="dmToggle">🌧 切换弹幕雨</button>
+  </div>
+  <button class="btn comments-next" id="commentsNext">最后，有一封信给你 💌</button>
+</section>
+
+<!-- ===== 8 情书 ===== -->
+<section id="scene-letter" class="scene">
+  <div class="letter-card" id="letterCard"></div>
+  <div class="letter-tools">
+    <button id="secretBtn">💌</button>
+    <button class="btn ghost" id="shakeBtn">📳 开启摇一摇彩蛋</button>
+  </div>
+  <div class="heart-burst-tip">把手机屏幕倒过来，会下爱心雨哦<br>（试着连续点几下 💌 看看？）</div>
+</section>
+
+<!-- 弹幕层 -->
+<div class="dm-layer" id="dmLayer"></div>
+<!-- 特效画布 -->
+<canvas id="starCanvas"></canvas>
+<canvas id="fxCanvas"></canvas>
+<canvas id="heartCanvas"></canvas>
+<div id="toast"></div>
+
+<script>
+/* =========================================================
+ * 配置区 —— 素材到位后只改这里
+ * ========================================================= */
+var CFG = {
+  password: "1028",                 // 锁屏密码（默认她的生日 10.28）
+  name: "池小晨",                   // 她的昵称
+  age: 23,                          // 她的年龄
+  birthdate: "2003-10-28",          // 她的完整生日（精确计算"来到世界多少天"）
+  candleCount: 23,                  // 蜡烛数量（= 她的年龄）
+  heroPhoto: {src:"https://aka.doubaocdn.com/s/5GbGs3zYDN", caption: ""},// 开场照片
+  photos: [
+    {src:"https://aka.doubaocdn.com/s/e2qBeG8IbZ", caption:"那天晚上，旋转木马上的你笑得比灯还亮"},
+    {src:"https://aka.doubaocdn.com/s/K33mQKYtJi", caption:"有风的下午，和远山、稻田一起发呆"},
+    {src:"https://aka.doubaocdn.com/s/kzOe8jwSIE", caption:"系上围裙，你就是最会做饭的小朋友"},
+    {src:"https://aka.doubaocdn.com/s/CyRdUVvE5n", caption:"城市的灯光，都为你悄悄暗了一度"},
+    {src:"https://aka.doubaocdn.com/s/rZOAlDBkhG", caption:"在钟楼下面，偷一个下午的浪漫"},
+    {src:"https://aka.doubaocdn.com/s/Qx7nXLryhg", caption:"阳光正好，和时间合个影"}
+  ],
+  comments: [
+    {who:"老同学", text:"越来越有气质~"},
+    {who:"好朋友", text:"越来越顺~"},
+    {who:"财神爷", text:"越来越有钱~"},
+    {who:"损友", text:"早点找个帅哥男朋友~"},
+    {who:"家人", text:"家人健康，心想事成~"},
+    {who:"闺蜜", text:"越来越美~"},
+    {who:"老同学", text:"天天开心~"},
+    {who:"大老板", text:"发大财，大发财~"}
+  ],
+  letterTitle: "致最特别的小晨",
+  letter: [
+    "遇见你之前，我从没想过，普通的日子可以被一个人点亮。",
+    "今天是你的生日，这一天之后，你又长大了一岁。可在我眼里，你永远是那个笑起来眼睛弯弯的女孩。",
+    "谢谢你出现在我的生命里，谢谢你把那么多平凡的瞬间，变成值得纪念的回忆。",
+    "新的一年，愿你被这个世界温柔以待，愿你所有的愿望都能实现，愿你永远做那个闪闪发光的小朋友。",
+    "往后的每一年，我都想陪在你身边，一起吹蜡烛，一起许愿，一起看烟花。",
+    "永远像花一样明媚自由，开开心心，洒脱幸福的过一生。"
+  ],
+  ending: "看完了，要一个很长很长的拥抱 🤗",
+  burstTitle: "生日快乐，{name}！",
+  secret: "彩蛋解锁：我会一直陪着你 💖",
+  music: ""
+};
+
+/* 工具 */
+function $(s){return document.querySelector(s);}
+function toast(msg){var t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(function(){t.classList.remove('show');},2600);}
+function goScene(id){
+  document.querySelectorAll('.scene').forEach(function(s){s.classList.remove('active');});
+  $(id).classList.add('active');
+  $('#starCanvas').style.opacity=(id==='#scene-wish')?1:0;
+  $('#fxCanvas').style.opacity=(id==='#scene-burst')?1:0;
+  var order=['#scene-lock','#scene-hero','#scene-album','#scene-cake','#scene-wish','#scene-burst','#scene-comments','#scene-letter'];
+  var idx=order.indexOf(id);
+  $('#progress i').style.width=((idx+1)/order.length*100)+'%';
+  if(id==='#scene-burst') startBurst();
+  if(id==='#scene-comments') startMarquee();
+  if(id==='#scene-letter') { if(!letterRendered) renderLetter(); }
+}
+
+/* 1 锁屏门 */
+function daysAlive(){
+  if(CFG.birthdate){
+    var b=new Date(CFG.birthdate+'T00:00:00');
+    if(!isNaN(b)) return Math.floor((Date.now()-b.getTime())/86400000);
+  }
+  return CFG.age*365 + Math.floor(CFG.age/4);
+}
+(function(){
+  $('#daysAlive').textContent='你已经来到这个世界 '+daysAlive()+' 天了 💫';
+  $('#lockDate').textContent='10 月 28 日';
+  function unlock(){
+    var v=$('#lockInput').value.trim();
+    if(v===CFG.password){ startMusic(); goScene('#scene-hero'); initHero(); }
+    else{ $('#lockErr').textContent='密码不对哦，再想想～（提示：她的生日）'; $('#lockInput').value=''; }
+  }
+  $('#lockBtn').addEventListener('click',unlock);
+  $('#lockInput').addEventListener('keydown',function(e){ if(e.key==='Enter') unlock(); });
+})();
+
+/* 2 开场 */
+var heroInit=false;
+function initHero(){
+  if(heroInit) return; heroInit=true;
+  var box=$('#heroPhoto');
+  if(CFG.heroPhoto.src){
+    var img=document.createElement('img');
+    img.src=(/^https?:/i.test(CFG.heroPhoto.src))?CFG.heroPhoto.src:'assets/photos/'+CFG.heroPhoto.src;
+    box.appendChild(img);
+  }else{
+    var d=document.createElement('div'); d.className='ph'; d.textContent='🌸'; box.appendChild(d);
+  }
+  var text='生日快乐，'+CFG.name+'~';
+  var g=$('#heroGreet'), i=0;
+  g.textContent='';
+  (function type(){
+    if(i<text.length){
+      g.innerHTML=text.slice(0,++i)+'<span class="cursor">|</span>';
+      setTimeout(type,120);
+    }else{
+      $('#heroSub').textContent='世界偶尔不够温柔，就先到我这里来';
+    }
+  })();
+}
+$('#heroNext').addEventListener('click',function(){ goScene('#scene-album'); initAlbum(); });
+
+/* 3 相册 */
+var albumInit=false;
+function initAlbum(){
+  if(albumInit) return; albumInit=true;
+  var track=$('#albumTrack');
+  CFG.photos.forEach(function(p,i){
+    var card=document.createElement('div'); card.className='album-card';
+    if(p.src){
+      var img=document.createElement('img');
+      img.src=(/^https?:/i.test(p.src))?p.src:'assets/photos/'+p.src; img.alt='回忆'+(i+1); card.appendChild(img);
+    }else{
+      var d=document.createElement('div'); d.className='ph'; d.textContent=['🎀','🌊','🌙','🍰','🌷','⭐'][i%6]; card.appendChild(d);
+    }
+    var cap=document.createElement('div'); cap.className='album-cap'; cap.textContent=p.caption||('回忆 '+(i+1)); card.appendChild(cap);
+    track.appendChild(card);
+  });
+}
+$('#albumNext').addEventListener('click',function(){ goScene('#scene-cake'); initCake(); });
+
+/* 4 蛋糕 */
+var candles=[], candleAll=Math.min(CFG.candleCount||24,30), micOn=false, audioCtx=null, analyser=null, micStream=null;
+var cakeInit=false, blowing=false;
+function initCake(){
+  if(cakeInit) return; cakeInit=true;
+  var row=$('#candleRow');
+  for(var i=0;i<candleAll;i++){
+    var c=document.createElement('div'); c.className='candle'; c.id='cand'+i;
+    c.innerHTML='<div class="smoke"></div><div class="flame"></div><div class="wick"></div><div class="body"></div>';
+    c.addEventListener('click',function(){ blowOne(this); });
+    row.appendChild(c); candles.push(c);
+  }
+  updateCandleHint();
+  if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
+    $('#blowBtn').style.display='inline-block';
+    $('#micTap').style.color='#ffd36b';
+  }
+}
+function blowOne(c){
+  if(!c.classList.contains('out')){
+    c.classList.add('out');
+    var s=c.querySelector('.smoke');
+    if(s){ s.parentNode.appendChild(s); setTimeout(function(){ if(s.parentNode) s.parentNode.removeChild(s); },1500); }
+    updateCandleHint();
+    checkAllOut();
+  }
+}
+function updateCandleHint(){
+  var left=candles.filter(function(c){return !c.classList.contains('out');}).length;
+  $('#candleLeft').textContent=left;
+}
+function checkAllOut(){
+  if(candles.every(function(c){return c.classList.contains('out');})){
+    setTimeout(function(){ goScene('#scene-wish'); startWish(); },900);
+  }
+}
+$('#blowBtn').addEventListener('click',function(){
+  if(micOn) return;
+  navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+    micStream=stream; micOn=true;
+    audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    var src=audioCtx.createMediaStreamSource(stream);
+    analyser=audioCtx.createAnalyser(); analyser.fftSize=512; analyser.smoothingTimeConstant=0.3;
+    src.connect(analyser);
+    $('#blowBtn').textContent='🎤 真吹模式已开启，对着手机吹气吧！';
+    $('#blowBtn').classList.add('active');
+    micLoop();
+  }).catch(function(){
+    toast('麦克风未授权，那就点蜡烛吹灭吧～');
+  });
+});
+function micLoop(){
+  if(!micOn||!analyser) return;
+  var data=new Uint8Array(analyser.frequencyBinCount);
+  function tick(){
+    if(!micOn) return;
+    analyser.getByteFrequencyData(data);
+    var sum=0; for(var i=0;i<data.length;i++) sum+=data[i];
+    var avg=sum/data.length;
+    if(avg>26){ blowing=true; }
+    else{ if(blowing){ blowAll(); blowing=false; } }
+    requestAnimationFrame(tick);
+  }
+  tick();
+}
+function blowAll(){
+  candles.forEach(function(c){ if(!c.classList.contains('out')) blowOne(c); });
+}
+
+/* 5 许愿 */
+var starInit=false, wishTimer=null;
+function startWish(){
+  if(!starInit){ starInit=true; initStars(); }
+  var n=7;
+  $('#wishCount').textContent=n;
+  clearInterval(wishTimer);
+  wishTimer=setInterval(function(){
+    n--;
+    if(n<=0){ clearInterval(wishTimer); goScene('#scene-burst'); }
+    else $('#wishCount').textContent=n;
+  },1000);
+}
+$('#wishOk').addEventListener('click',function(){ clearInterval(wishTimer); goScene('#scene-burst'); });
+
+function initStars(){
+  var cv=$('#starCanvas'), ctx=cv.getContext('2d');
+  function size(){ cv.width=innerWidth; cv.height=innerHeight; }
+  size(); addEventListener('resize',size);
+  var stars=[];
+  for(var i=0;i<90;i++) stars.push({x:Math.random(),y:Math.random(),r:Math.random()*1.4+.4,a:Math.random()*.6+.2,s:Math.random()*.004+.001});
+  function draw(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    stars.forEach(function(st){
+      st.y+=st.s; if(st.y>1) st.y=0;
+      ctx.beginPath(); ctx.arc(st.x*cv.width,st.y*cv.height,st.r,0,Math.PI*2);
+      ctx.fillStyle='rgba(255,255,255,'+st.a+')'; ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+/* 6 爆发 */
+var fxInit=false, burstOnce=false;
+function startBurst(){
+  if(!fxInit){ fxInit=true; initFx(); }
+  if(!burstOnce){
+    burstOnce=true;
+    $('#burstTitle').textContent=CFG.burstTitle.replace('{name}',CFG.name);
+    toast('你的愿望，已经悄悄被听见啦 ✨');
+  }
+}
+function initFx(){
+  var cv=$('#fxCanvas'), ctx=cv.getContext('2d');
+  function size(){ cv.width=innerWidth; cv.height=innerHeight; }
+  size(); addEventListener('resize',size);
+  var parts=[], confetti=[];
+  function confettiRain(t){
+    confetti.push({x:Math.random()*cv.width,y:-20,vx:(Math.random()-.5)*2,vy:Math.random()*3+2,w:Math.random()*10+5,h:Math.random()*6+3,c:'hsl('+(Math.random()*60+330)+',80%,65%)',r:Math.random()*Math.PI,rv:(Math.random()-.5)*.2});
+    if(confetti.length>260) confetti.splice(0,confetti.length-260);
+    confetti.forEach(function(p,i){
+      p.x+=p.vx; p.y+=p.vy; p.r+=p.rv;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r); ctx.fillStyle=p.c; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore();
+      if(p.y>cv.height+30) confetti.splice(i,1);
+    });
+  }
+  function firework(t){
+    if(t%40===0){
+      var cx=Math.random()*cv.width, cy=Math.random()*cv.height*0.6;
+      var hue=Math.random()*360;
+      for(var i=0;i<46;i++){
+        var a=i/46*Math.PI*2, sp=Math.random()*4+2;
+        parts.push({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:0,max:60+Math.random()*30,c:'hsl('+hue+',85%,65%)'});
+      }
+    }
+    parts.forEach(function(p,i){
+      p.x+=p.vx; p.y+=p.vy; p.vy+=.06; p.life++;
+      ctx.beginPath(); ctx.arc(p.x,p.y,1.6,0,Math.PI*2); ctx.fillStyle='hsla('+(p.c)+','+(1-p.life/p.max)+')'; ctx.fill();
+      if(p.life>p.max) parts.splice(i,1);
+    });
+  }
+  (function loop(t){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    confettiRain(t); firework(t);
+    requestAnimationFrame(loop);
+  })(0);
+}
+$('#burstNext').addEventListener('click',function(){ goScene('#scene-comments'); });
+
+/* 7 评论墙 */
+var mqInit=false, dmInit=false;
+function startMarquee(){
+  if(mqInit) return; mqInit=true;
+  var wrap=$('#marqueeWrap');
+  var rows=[[0,1,2,3,4,5],[5,4,3,2,1,0],[2,0,5,3,1,4]];
+  rows.forEach(function(idxRow,ri){
+    var row=document.createElement('div'); row.className='mq-row r'+(ri+1);
+    var pills=[];
+    idxRow.forEach(function(ci){
+      var cm=CFG.comments[ci%CFG.comments.length];
+      var pill=document.createElement('span'); pill.className='mq-pill';
+      pill.innerHTML='<span class="ava">'+(cm.who[0]||'友')+'</span><span class="nm">'+cm.who+'：</span>'+cm.text+'<span class="tm">刚刚</span>';
+      row.appendChild(pill); pills.push(pill);
+    });
+    wrap.appendChild(row);
+    var dur=13+ri*3;
+    pills.forEach(function(p,i){
+      p.classList.add('mq-anim');
+      p.style.animationDuration=dur+'s';
+      p.style.animationDelay=(-i*dur/pills.length)+'s';
+    });
+  });
+}
+$('#dmToggle').addEventListener('click',function(){
+  var layer=$('#dmLayer');
+  if(layer.classList.contains('on')){
+    layer.classList.remove('on'); layer.innerHTML=''; this.textContent='🌧 切换弹幕雨';
+  }else{
+    layer.classList.add('on'); this.textContent='☀️ 关掉弹幕';
+    if(!dmInit){ dmInit=true;
+      CFG.comments.forEach(function(cm){
+        var d=document.createElement('div'); d.className='dm';
+        d.style.top=(Math.random()*70+5)+'%';
+        d.style.animationDuration=(9+Math.random()*8)+'s';
+        d.style.animationDelay=(-Math.random()*8)+'s';
+        d.textContent=cm.who+'：'+cm.text;
+        layer.appendChild(d);
+      });
+    }
+  }
+});
+$('#commentsNext').addEventListener('click',function(){ goScene('#scene-letter'); });
+
+/* 8 情书 + 彩蛋 */
+var letterRendered=false, secretClicks=0;
+function renderLetter(){
+  letterRendered=true;
+  var card=$('#letterCard');
+  var h=document.createElement('h2'); h.textContent=CFG.letterTitle; card.appendChild(h);
+  CFG.letter.forEach(function(para){
+    var p=document.createElement('p'); p.textContent=para; card.appendChild(p);
+  });
+  var e=document.createElement('div'); e.className='ending'; e.textContent=CFG.ending; card.appendChild(e);
+  card.scrollTop=0;
+}
+$('#secretBtn').addEventListener('click',function(){
+  secretClicks++;
+  if(secretClicks===5){
+    secretClicks=0;
+    toast(CFG.secret);
+    heartRain(120);
+  }else if(secretClicks===1){
+    toast('再点几下 💌 试试？');
+  }
+});
+var heartInit=false;
+function heartRain(n){
+  if(!heartInit){ heartInit=true; initHearts(); }
+  var cv=$('#heartCanvas'), ctx=cv.getContext('2d');
+  var hs=['💖','💗','💕','💞','🌸','✨','💛'];
+  for(var i=0;i<n;i++){
+    var e=document.createElement('div');
+    e.style.cssText='position:absolute;left:0;top:0;font-size:'+(Math.random()*22+14)+'px;color:#fff;will-change:transform;z-index:55;pointer-events:none;';
+    e.textContent=hs[Math.floor(Math.random()*hs.length)];
+    document.body.appendChild(e);
+    var x=Math.random()*innerWidth, y=-30, dur=2.5+Math.random()*3, sway=Math.random()*120-60;
+    e.style.transform='translate3d('+x+'px,'+y+'px,0)';
+    e.style.transition='transform '+dur+'s linear, opacity '+dur+'s';
+    requestAnimationFrame(function(){ setTimeout(function(){ e.style.transform='translate3d('+(x+sway)+'px,'+(innerHeight+40)+'px,0)'; e.style.opacity=0; },30); });
+    setTimeout(function(){ if(e.parentNode) e.parentNode.removeChild(e); },dur*1000+500);
+  }
+}
+$('#shakeBtn').addEventListener('click',function(){
+  var btn=this;
+  function enable(){
+    window.addEventListener('devicemotion',function(ev){
+      var acc=ev.accelerationIncludingGravity;
+      if(!acc) return;
+      var m=Math.abs(acc.x)+Math.abs(acc.y)+Math.abs(acc.z);
+      if(m>26){ heartRain(40); toast('摇出了好多好多爱心 💖'); }
+    });
+    btn.textContent='📳 摇一摇彩蛋已开启';
+    toast('现在摇晃手机，会下爱心雨哦');
+  }
+  if(typeof DeviceMotionEvent!=='undefined' && DeviceMotionEvent.requestPermission){
+    DeviceMotionEvent.requestPermission().then(function(state){
+      if(state==='granted') enable(); else toast('未授权，跳过摇一摇彩蛋～');
+    }).catch(function(){ enable(); });
+  }else{
+    enable();
+  }
+});
+
+/* 音乐 */
+var musicStarted=false;
+function startMusic(){
+  if(musicStarted) return; musicStarted=true;
+  if(CFG.music){
+    var a=new Audio('assets/music/'+CFG.music); a.loop=true; a.volume=.55; a.play().catch(function(){});
+    return;
+  }
+  try{
+    var ctx=new (window.AudioContext||window.webkitAudioContext)();
+    var notes=[523,523,587,659,659,587,523,494,440,440,494,523,523,494,494,587,
+               523,523,587,659,659,587,523,494,440,440,494,523,494,440,440,523];
+    var t=ctx.currentTime+.3;
+    notes.forEach(function(f){
+      var o=ctx.createOscillator(), g=ctx.createGain();
+      o.type='sine'; o.frequency.value=f;
+      g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.16,t+.04); g.gain.exponentialRampToValueAtTime(.001,t+.85);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(t); o.stop(t+.9);
+      t+=.55;
+    });
+  }catch(e){}
+}
+
+/* 启动 */
+(function(){
+  try{
+    var q=new URLSearchParams(location.search);
+    if(q.get('debug')==='1'){
+      var sc=q.get('scene')||'hero';
+      startMusic();
+      var map={'hero':function(){goScene('#scene-hero');initHero();},'album':function(){goScene('#scene-album');initAlbum();},'cake':function(){goScene('#scene-cake');initCake();},'wish':function(){goScene('#scene-wish');startWish();},'burst':function(){goScene('#scene-burst');},'comments':function(){goScene('#scene-comments');},'letter':function(){goScene('#scene-letter');},'lock':function(){goScene('#scene-lock');}};
+      (map[sc]||map['hero'])();
+    }
+  }catch(e){}
+  document.addEventListener('touchstart',function(){ try{ if(window.AudioContext) new AudioContext(); }catch(e){} },{once:true,passive:true});
+})();
+</script>
+</body>
+</html>
